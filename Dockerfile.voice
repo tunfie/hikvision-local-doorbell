@@ -1,0 +1,9 @@
+# The SDK and third-party image retain their own licence terms.
+FROM ghcr.io/pergolafabio/hikvision-doorbell@sha256:75361bb7466452dca94cd7800f595e2b6b94c05cd19fd0c98d49a156f45feab3
+USER root
+RUN mkdir -p /opt/sdk-python && cp -a /root/.local/lib/python3.10/site-packages/. /opt/sdk-python/
+ENV PYTHONPATH=/opt/sdk-python:/app
+COPY bridge/native_voice.py bridge/native_voice_server.py /opt/local-doorbell/
+WORKDIR /app
+USER 1000:1000
+ENTRYPOINT ["python3", "/opt/local-doorbell/native_voice_server.py"]

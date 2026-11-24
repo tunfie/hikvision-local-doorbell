@@ -1,0 +1,14 @@
+{
+  "domain": "huis_deurbel",
+  "name": "Hikvision Local Doorbell (experimental)",
+  "version": "0.1.0",
+  "documentation": "https://github.com/tunfie/hikvision-local-doorbell",
+  "codeowners": [
+    "@tunfie"
+  ],
+  "iot_class": "local_push",
+  "dependencies": [
+    "camera"
+  ],
+  "requirements": []
+}

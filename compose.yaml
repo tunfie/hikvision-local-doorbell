@@ -1,0 +1,44 @@
+services:
+  local_call_gateway:
+    image: python:3.13-slim
+    command: [python3, /app/sip_gateway.py]
+    user: "1000:1000"
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      HUIS_CAMERA_IP: ${HUIS_CAMERA_IP:?Configure camera IPv4}
+      HUIS_SERVER_IP: ${HUIS_SERVER_IP:?Configure server LAN IPv4}
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - ./bridge:/app:ro
+      - ./config/gateway.json:/data/gateway.json:ro
+      - ./state:/state
+    ports:
+      - "${HUIS_SERVER_IP}:5060:5060/udp"
+      - "127.0.0.1:8099:8099"
+    mem_limit: 64m
+    cpus: 0.15
+  native_voice:
+    build:
+      context: .
+      dockerfile: Dockerfile.voice
+    user: "1000:1000"
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment:
+      PYTHONDONTWRITEBYTECODE: "1"
+    volumes:
+      - ./config/voice.json:/data/voice.json:ro
+    tmpfs:
+      - /tmp:size=16m,uid=1000,gid=1000
+      - /app/SDKLogs:size=8m,uid=1000,gid=1000
+    ports:
+      - "127.0.0.1:8100:8100"
+      - "${DOCKER_GATEWAY:-172.17.0.1}:8100:8100"
+      - "${HUIS_SERVER_IP}:40000:40000/udp"
+    mem_limit: 256m
+    cpus: 0.25
